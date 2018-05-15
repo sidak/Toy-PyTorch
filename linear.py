@@ -7,12 +7,12 @@ class Linear(Module):
 		super(Linear, self).__init__()
 		self.in_dim = in_dim
 		self.out_dim = out_dim
-		self.weight = Variable(Tensor((out_dim, in_dim)))
-		self.bias = Variable(Tensor((out_dim, )))
+		self.weight = Variable(Tensor(out_dim, in_dim))
+		self.bias = Variable(Tensor(out_dim, ))
 		
 	def forward(self , input):
 		assert input.data.shape == (self.in_dim, )
-		return self.weight.data @ input.data + self.bias	
+		return Variable(self.weight.data @ input.data + self.bias.data)	
 	
 	def backward(self , * gradwrtoutput):
 		raise NotImplementedError
