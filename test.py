@@ -1,15 +1,18 @@
-import nnlib
-from torch import Tensor
+from variable import Variable
+from linear import Linear
+from mse import MSE
 
-x = torch.Tensor([1, 2, 3])
-y = torch.Tensor([7])
+if __name__ == '__main__':
 
-linear = nnlib.Linear(x.shape[0], y.shape[0])
+	x = Variable([1, 2, 3])
+	y = Variable([7])
 
-loss = nnlib.MSE(linear, y)
+	linear = Linear(x.shape[0], y.shape[0])
 
-loss.backward()
+	loss = MSE(linear, y)
 
-print(x.grad)
+	loss.backward()
+
+	print(x.grad)
 
 
