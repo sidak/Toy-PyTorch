@@ -1,4 +1,4 @@
-from nnlib import Module
+from module import Module
 
 class Activation(Module):
 
