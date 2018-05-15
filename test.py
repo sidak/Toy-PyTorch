@@ -1,18 +1,20 @@
 from variable import Variable
 from linear import Linear
-from mse import MSE
+from torch import Tensor
+#from mse import MSE
+
 
 if __name__ == '__main__':
 
-	x = Variable([1, 2, 3])
-	y = Variable([7])
-
+	x = Variable(Tensor([1, 2, 3]))
+	y = Variable(Tensor([7]))
+	print(x.shape, y.shape)
 	linear = Linear(x.shape[0], y.shape[0])
+	pred = linear.forward(x)
 
-	loss = MSE(linear, y)
+	#loss = MSE(linear, y)
 
-	loss.backward()
-
-	print(x.grad)
-
-
+	#loss.backward()
+	print("Pred is ")
+	print(pred)
+	#print(x.grad)
