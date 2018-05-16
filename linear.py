@@ -1,6 +1,7 @@
 from module import Module
 from variable import Variable
 from torch import Tensor
+
 class Linear(Module):
 
 	def __init__(self, in_dim, out_dim):
@@ -14,8 +15,10 @@ class Linear(Module):
 		assert input.data.shape == (self.in_dim, )
 		return Variable(self.weight.data @ input.data + self.bias.data)	
 	
-	def backward(self , * gradwrtoutput):
-		raise NotImplementedError
+	def backward(self , gradwrtoutput):
+		self.bias.grad = gradwrtoutput
+		self.weight.grad = gradwrtoutput @ 
+
 	
 	def param(self):
 		return self.weight, self.bias
