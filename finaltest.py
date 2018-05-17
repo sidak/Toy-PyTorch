@@ -1,4 +1,5 @@
 from torch import Tensor
+import torch
 import math
 from linear import Linear
 from torch import Tensor
@@ -20,15 +21,15 @@ train_input, train_target = generate_disc_set(1000)
 test_input, test_target = generate_disc_set(1000)
 
 num_hidden = 3
-
+weight_init ='uniform'
 layers = []
-linear = Linear(2, 25, weight_init='ones')
+linear = Linear(2, 25, weight_init=weight_init)
 layers.append(linear)
 layers.append(Relu())
 for i in range(num_hidden-1):
-	layers.append(Linear(25, 25, weight_init='ones'))
+	layers.append(Linear(25, 25, weight_init=weight_init))
 	layers.append(Relu())
-layers.append(Linear(25, 2, weight_init='ones'))
+layers.append(Linear(25, 2, weight_init=weight_init))
 
 
 net_2layer = Network(layers, train_input.shape[0])
@@ -37,7 +38,7 @@ mse = MSE()
 
 
 lr = 1e-3
-num_iter = 20000
+num_iter = 1400
 
 timesteps = []
 loss_at_timesteps = []
@@ -58,7 +59,10 @@ for it in range(num_iter):
 	loss_at_timesteps.append(loss)
 
 pred = net_2layer.forward(train_input.view(-1, train_input.shape[0]))
-print("Prediction at the end ", pred)
+
+_, pred = torch.max(pred, 0)
+print('Train accuracy:')
+print(torch.mean(torch.abs(pred - train_target).type(torch.FloatTensor)))
 
 
 
