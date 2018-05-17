@@ -73,5 +73,9 @@ if __name__ == '__main__':
 		for par_grad in layer.param_grad():
 			print(par_grad)
 
-	
-	
+	print("Doing param update")
+	net_2layer.grad_step(lr=1e-3)
+	print("Printing params after update")
+	for layer in net_2layer.layers:
+		for par in layer.param():
+			print(par)
