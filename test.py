@@ -36,7 +36,12 @@ if __name__ == '__main__':
 	
 	mse = MSE()
 	loss = mse.forward(pred_2layer, y)
-	print("loss is ")
+	print("loss for 2 layer net is ")
 	print(loss)
+
+	# Should be 2*(18-7) = 22
+	loss_grad = mse.backward()
+	print("loss_grad for 2layer net is ")
+	print(loss_grad)
 
 	
