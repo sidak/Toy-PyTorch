@@ -1,5 +1,4 @@
 from module import Module
-from variable import Variable
 from torch import Tensor
 
 class Linear(Module):
@@ -11,29 +10,35 @@ class Linear(Module):
 		self.weight_init = weight_init
 		self.bias_init = bias_init
 
+		self.weight_grad = None
+		self.bias_grad = None
+
 		if self.weight_init is None:
-			self.weight = Variable(Tensor(out_dim, in_dim))
+			self.weight = Tensor(out_dim, in_dim)
 		elif self.weight_init == 'ones':
 			ones_list = [1] * (in_dim*out_dim)
-			self.weight = Variable(Tensor(ones_list).view(out_dim, in_dim))
+			self.weight = Tensor(ones_list).view(out_dim, in_dim)
 
 		if self.bias_init is None:
-			self.bias = Variable(Tensor(out_dim, ))
+			self.bias = Tensor(out_dim, )
 		elif self.bias_init == 'zero':
 			zeros_list = [0] * (out_dim)
-			self.bias = Variable(Tensor(zeros_list).view(out_dim, ))
+			self.bias = Tensor(zeros_list).view(out_dim, )
 
 	def forward(self , input):
 		self.input = input
-		assert input.data.shape == (self.in_dim, )
-		return Variable(self.weight.data @ input.data + self.bias.data)	
+		assert input.shape == (self.in_dim, )
+		return self.weight @ input + self.bias
 	
 	def backward(self , gradwrtoutput):
 		# init them to zero in the loop as params.zero_grad()
 		# Add then here I should accumulate
-		self.bias.grad = gradwrtoutput.data
-		self.weight.grad =  gradwrtoutput.data.view(-1, 1) @ self.input.data.view(1, -1)
-		return Variable(self.weight.data.t() @ gradwrtoutput.data)
+		self.bias.grad = gradwrtoutput
+		self.weight.grad =  gradwrtoutput.view(-1, 1) @ self.input.view(1, -1)
+		return self.weight.t() @ gradwrtoutput
 	
 	def param(self):
-		return self.weight, self.bias
+		return [self.weight, self.bias]
+
+	def param_grad(self):
+		return [self.weight_grad, self.bias_grad]

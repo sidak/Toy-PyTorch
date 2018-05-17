@@ -1,4 +1,3 @@
-from variable import Variable
 from linear import Linear
 from torch import Tensor
 from network import Network
@@ -7,8 +6,8 @@ from MSE import MSE
 
 if __name__ == '__main__':
 
-	x = Variable(Tensor([1, 2, 3]))
-	y = Variable(Tensor([7, 10]))
+	x = Tensor([1, 2, 3])
+	y = Tensor([7, 10])
 	print(x.shape, y.shape)
 
 	linear = Linear(x.shape[0], y.shape[0], weight_init='ones')
