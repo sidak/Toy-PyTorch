@@ -31,9 +31,9 @@ class Linear(Module):
 	def backward(self , gradwrtoutput):
 		# init them to zero in the loop as params.zero_grad()
 		# Add then here I should accumulate
-		self.bias.grad = gradwrtoutput
-		self.weight.grad =  self.input.data @ gradwrtoutput.t()
-		return self.weight.data.t() @ gradwrtoutput
+		self.bias.grad = gradwrtoutput.data
+		self.weight.grad =  gradwrtoutput.data.view(-1, 1) @ self.input.data.view(1, -1)
+		return Variable(self.weight.data.t() @ gradwrtoutput.data)
 	
 	def param(self):
 		return self.weight, self.bias
