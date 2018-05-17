@@ -48,3 +48,8 @@ class Linear(Module):
 	def set_param_grad(self, param_grad):
 		self.weight_grad = param_grad[0]
 		self.bias_grad = param_grad[1]
+
+	def update_param(self, lr):
+		self.weight = self.weight - lr*self.weight_grad
+		self.bias = self.bias - lr*self.bias_grad
+
