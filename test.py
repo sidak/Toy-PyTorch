@@ -43,7 +43,35 @@ if __name__ == '__main__':
 	print("loss_grad for 2layer net is ")
 	print(loss_grad)
 
+	print("Printing params Grad before ")
+	for layer in net_2layer.layers:
+		for par_grad in layer.param_grad():
+			print(par_grad)
+
+
+	print("now setting param grad to zero")
+	net_2layer.zero_grad()
+
+	print("Printing params Grad after ")
+	for layer in net_2layer.layers:
+		for par_grad in layer.param_grad():
+			print(par_grad)
+
+	print("Printing params before backward")
+	for layer in net_2layer.layers:
+		for par in layer.param():
+			print(par)
+	
+	print("Doing backward pass")
 	net_2layer.backward(loss_grad)
+	print("Printing params after backward")
+	for layer in net_2layer.layers:
+		for par in layer.param():
+			print(par)
+	print("Printing params Grad")
+	for layer in net_2layer.layers:
+		for par_grad in layer.param_grad():
+			print(par_grad)
 
-
+	
 	
