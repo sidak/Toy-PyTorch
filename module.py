@@ -11,3 +11,12 @@ class Module(object):
 	
 	def param(self):
 		return []
+
+	def param_grad(self):
+		return []
+
+	def set_param_grad(self, param_grad):
+		pass
+
+	def update_param(self, lr):
+		pass
