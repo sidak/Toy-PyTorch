@@ -43,3 +43,9 @@ class Network(Module):
 	def zero_grad(self):
 		for layer in self.layers:
 			layer.set_param_grad([self._set_zero(par_grad) for par_grad in layer.param_grad()])
+
+	def grad_step(self, lr):
+		for layer in self.layers:
+			layer.update_param(lr)
+
+	
