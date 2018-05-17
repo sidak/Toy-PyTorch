@@ -1,6 +1,8 @@
 from module import Module
 from variable import Variable
 from torch import Tensor
+from torch import FloatTensor
+
 from linear import Linear
 
 class MSE(Module):
@@ -8,10 +10,11 @@ class MSE(Module):
 		super(MSE, self).__init__()
 
 	def forward(self, pred, y):	 
-		return (pred.data - y.data).pow(2).sum()/y.shape[0]
+		# dim = 0 is necessary, otherwise returns just a scalar
+		return (pred.data - y.data).pow(2).sum(dim=0)/y.shape[0]
 
 	def backward(self, pred, y):
-		return 2*(pred.data - y.data).sum()/y.shape[0]
+		return 2*(pred.data - y.data).sum(dim=0)/y.shape[0]
 
 if __name__ == '__main__':
 	x = Variable(Tensor([1, 2, 3]))
