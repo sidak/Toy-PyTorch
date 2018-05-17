@@ -18,6 +18,9 @@ class Tanh(Module):
 		#self.bias.grad = gradwrtinput
 		#self.weight.grad = gradwrtinput @ 
 		return gradwrtinput * (1.0 - (self._tanh(self.input) * self._tanh(self.input)))
+
+	def init_weights(nb_samples):
+		return
 	
 
 class Relu(Module):
@@ -37,3 +40,25 @@ class Relu(Module):
 		#self.bias.grad = gradwrtinput
 		#self.weight.grad = gradwrtinput @ 
 		return gradwrtinput * self._relu(self.input)
+
+	 def init_weights(nb_samples):
+		return
+
+class Sigmoid(Module):
+
+	def __init__(self):
+		super(Sigmoid, self).__init__()
+		self.input = None
+
+	def forward(self, input):
+		self.input = input
+		return self._sigmoid(input)
+
+	def _sigmoid(self,x):
+		return x.exp()/(x.exp()+1.0)
+
+	def backward(self, gradwrtinput):
+		return gradwrtinput * self._sigmoid(self.input) * (1.0 - self._sigmoid(self.input))
+
+	def init_weights(nb_samples):
+		return
