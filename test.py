@@ -2,7 +2,7 @@ from variable import Variable
 from linear import Linear
 from torch import Tensor
 from network import Network
-#from mse import MSE
+from MSE import MSE
 
 
 if __name__ == '__main__':
@@ -30,8 +30,13 @@ if __name__ == '__main__':
 
 	pred_2layer = net_2layer.forward(x)
 
-
-	
 	#loss.backward()
 	print("pred_2layer is ")
 	print(pred_2layer)
+	
+	mse = MSE()
+	loss = mse.forward(pred_2layer, y)
+	print("loss is ")
+	print(loss)
+
+	
