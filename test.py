@@ -4,7 +4,7 @@ from network import Network
 from MSE import MSE
 import matplotlib
 import matplotlib.pyplot as plt
-
+from activation import Relu, Tanh
 def run_mini_example():
 
 	x = Tensor([1, 2, 3])
@@ -84,10 +84,17 @@ if __name__ == '__main__':
 	y = Tensor([7, 10])
 	print(x.shape, y.shape)
 
+	linear_a = Linear(x.shape[0], x.shape[0], weight_init='ones')
+	linear_b = Linear(x.shape[0], y.shape[0], weight_init='ones')
+	relu = Relu()
+	net_2layer = Network([linear_a, relu, linear_b])
+
+	'''
 	linear1 = Linear(x.shape[0], x.shape[0], weight_init='ones')
 	linear2 = Linear(x.shape[0], y.shape[0], weight_init='ones')
 	
 	net_2layer = Network([linear1, linear2])
+	'''
 	mse = MSE()
 
 	lr = 1e-3
