@@ -8,7 +8,7 @@ from MSE import MSE
 if __name__ == '__main__':
 
 	x = Variable(Tensor([1, 2, 3]))
-	y = Variable(Tensor([7]))
+	y = Variable(Tensor([7, 10]))
 	print(x.shape, y.shape)
 
 	linear = Linear(x.shape[0], y.shape[0], weight_init='ones')
@@ -43,5 +43,8 @@ if __name__ == '__main__':
 	loss_grad = mse.backward()
 	print("loss_grad for 2layer net is ")
 	print(loss_grad)
+
+	net_2layer.backward(loss_grad)
+
 
 	
