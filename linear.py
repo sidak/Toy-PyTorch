@@ -9,7 +9,6 @@ class Linear(Module):
 		self.out_dim = out_dim
 		self.weight_init = weight_init
 		self.bias_init = bias_init
-
 		self.weight_grad = None
 		self.bias_grad = None
 
@@ -30,6 +29,11 @@ class Linear(Module):
 	def forward(self , input):
 		self.input = input
 		assert input.shape == (self.in_dim, )
+		# input = (3, 2)
+		# wt = (3, 3)
+		# 
+		# input = (in, 1) bias (out, 1)
+		# input = (in, 2) bias (out, 2)
 		return self.weight @ input + self.bias
 	
 	def backward(self , gradwrtoutput):
