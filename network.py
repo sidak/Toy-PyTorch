@@ -6,20 +6,17 @@ class Network(Module):
 	def __init__(self, layers, nb_samples):
 		super(Network, self).__init__()
 		self.layers = layers
-        self.nb_samples = nb_samples
-        self.init_weights()
+		self.nb_samples = nb_samples
+		self.init_weights()
 		
 	def forward(self , input):
 		inp = input
 		for layer in self.layers:
 			out = layer.forward(inp)
-			#print("out is ", out)
 			inp = out
 		return out
 
 	def backward(self , gradwrtoutput):
-		#self.bias.grad = gradwrtoutput
-		#self.weight.grad = gradwrtoutput @ 
 		grad = gradwrtoutput
 		for layer in reversed(self.layers):
 			grad = layer.backward(grad)
@@ -32,15 +29,13 @@ class Network(Module):
 
 	def _set_zero(self, tens):
 		tens_shape = tens.shape
-		#print(tens_shape)
 		zeros_list = [0.0] * self._get_components(tens_shape)
-		#print(zeros_list)
 		tens = Tensor(zeros_list).view(tens_shape)
 		return tens
 
-    def init_weights(self):
-        for layer in self.layers:
-            layer.init_weights(self.nb_samples)
+	def init_weights(self):
+		for layer in self.layers:
+			layer.init_weights(self.nb_samples)
 
 	def zero_grad(self):
 		for layer in self.layers:

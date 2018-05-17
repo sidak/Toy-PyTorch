@@ -30,12 +30,14 @@ for i in range(num_hidden-1):
 	layers.append(Relu())
 layers.append(Linear(25, 2, weight_init='ones'))
 
-net_2layer = Network(layers)
+
+net_2layer = Network(layers, train_input.shape[0])
 
 mse = MSE()
 
+
 lr = 1e-3
-num_iter = 200
+num_iter = 20000
 
 timesteps = []
 loss_at_timesteps = []
@@ -43,9 +45,11 @@ loss_at_timesteps = []
 for it in range(num_iter):
 	
 	net_2layer.zero_grad()
-	pred_2layer = net_2layer.forward(train_input.narrow(0, 0, train_input.shape[0]))
-	loss = mse.forward(pred_2layer,test_input.narrow(0, 0, train_input.shape[0]) )
-	print("At iteration ", str(it), " the loss is ", loss)
+	pred_2layer = net_2layer.forward(train_input.view(-1, train_input.shape[0]))
+
+	loss = mse.forward(pred_2layer,test_input.view(-1, test_input.shape[0]))
+	print(loss)
+	#print("At iteration ", str(it), " the loss is ", loss)
 	loss_grad = mse.backward()
 	net_2layer.backward(loss_grad)
 	net_2layer.grad_step(lr=1e-3)
@@ -53,15 +57,18 @@ for it in range(num_iter):
 	timesteps.append(it)
 	loss_at_timesteps.append(loss)
 
-print("Prediction at the end ", net_2layer.forward(x))
+pred = net_2layer.forward(train_input.view(-1, train_input.shape[0]))
+print("Prediction at the end ", pred)
 
-fig, ax = plt.subplots()
-ax.plot(timesteps, loss_at_timesteps)
 
-ax.set(xlabel='iteration (s)', ylabel='Training Loss',
-       title='The Loss curve')
-ax.grid()
 
-#fig.savefig("test.png")
-plt.show()
+# fig, ax = plt.subplots()
+# ax.plot(timesteps, loss_at_timesteps)
+
+# ax.set(xlabel='iteration (s)', ylabel='Training Loss',
+#        title='The Loss curve')
+# ax.grid()
+
+# #fig.savefig("test.png")
+# plt.show()
 

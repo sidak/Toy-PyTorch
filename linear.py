@@ -12,23 +12,26 @@ class Linear(Module):
 		self.weight_grad = None
 		self.bias_grad = None
 
+
+	def init_weights(self, nb_samples):
+
 		if self.weight_init is None:
-			self.weight = Tensor(out_dim, in_dim)
+			self.weight = Tensor(self.out_dim, self.in_dim)
 		elif self.weight_init == 'ones':
-			ones_list = [1] * (in_dim*out_dim)
-			self.weight = Tensor(ones_list).view(out_dim, in_dim)
-		self.weight_grad = Tensor(out_dim, in_dim)
+			ones_list = [1] * (self.in_dim*self.out_dim)
+			self.weight = Tensor(ones_list).view(self.out_dim, self.in_dim)
+		self.weight_grad = Tensor(self.out_dim, self.in_dim)
 
 		if self.bias_init is None:
-			self.bias = Tensor(out_dim, )
+			self.bias = Tensor(self.out_dim, nb_samples)
 		elif self.bias_init == 'zero':
-			zeros_list = [0] * (out_dim)
-			self.bias = Tensor(zeros_list).view(out_dim, )
-		self.bias_grad = Tensor(out_dim, )
+			zeros_list = [0] * (self.out_dim * nb_samples)
+			self.bias = Tensor(zeros_list).view(self.out_dim, nb_samples)
+		self.bias_grad = Tensor(self.out_dim, nb_samples)
 		
 	def forward(self , input):
 		self.input = input
-		assert input.shape == (self.in_dim, )
+		#assert input.shape == (self.in_dim, )
 		# input = (3, 2)
 		# wt = (3, 3)
 		# 
@@ -40,7 +43,8 @@ class Linear(Module):
 		# init them to zero in the loop as params.zero_grad()
 		# Add then here I should accumulate
 		self.bias_grad += gradwrtoutput
-		self.weight_grad +=  gradwrtoutput.view(-1, 1) @ self.input.view(1, -1)
+		nb_samples = gradwrtoutput.shape[1]
+		self.weight_grad +=  gradwrtoutput.view(-1, nb_samples) @ self.input.view(nb_samples, -1)
 		return self.weight.t() @ gradwrtoutput
 	
 	def param(self):

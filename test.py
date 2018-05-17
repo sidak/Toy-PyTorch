@@ -80,50 +80,51 @@ def run_bigger_example():
 
 if __name__ == '__main__':
 
-	x = Tensor([1, 2, 3])
+	x = Tensor([[1, 2, 3], [1, 2, 3]])
 	y = Tensor([7, 10])
 	print(x.shape, y.shape)
 
-	linear_a = Linear(x.shape[0], x.shape[0], weight_init='ones')
-	linear_b = Linear(x.shape[0], y.shape[0], weight_init='ones')
+	linear_a = Linear(x.shape[1], 4, weight_init='ones')
+	#linear_b = Linear(x.shape[0], y.shape[0], weight_init='ones')
 	relu = Relu()
-	net_2layer = Network([linear_a, relu, linear_b])
-
+	net_2layer = Network([linear_a], 2)#, relu, linear_b])
+	print(x.view(-1, 2).shape)
+	print(net_2layer.forward(x.view(-1, 2)))
 	'''
 	linear1 = Linear(x.shape[0], x.shape[0], weight_init='ones')
 	linear2 = Linear(x.shape[0], y.shape[0], weight_init='ones')
 	
 	net_2layer = Network([linear1, linear2])
 	'''
-	mse = MSE()
+	# mse = MSE()
 
-	lr = 1e-3
-	num_iter = 200
+	# lr = 1e-3
+	# num_iter = 200
 
-	timesteps = []
-	loss_at_timesteps = []
+	# timesteps = []
+	# loss_at_timesteps = []
 
-	for it in range(num_iter):
+	# for it in range(num_iter):
 		
-		net_2layer.zero_grad()
-		pred_2layer = net_2layer.forward(x)
-		loss = mse.forward(pred_2layer, y)
-		print("At iteration ", str(it), " the loss is ", loss)
-		loss_grad = mse.backward()
-		net_2layer.backward(loss_grad)
-		net_2layer.grad_step(lr=1e-3)
+	# 	net_2layer.zero_grad()
+	# 	pred_2layer = net_2layer.forward(x)
+	# 	loss = mse.forward(pred_2layer, y)
+	# 	print("At iteration ", str(it), " the loss is ", loss)
+	# 	loss_grad = mse.backward()
+	# 	net_2layer.backward(loss_grad)
+	# 	net_2layer.grad_step(lr=1e-3)
 
-		timesteps.append(it)
-		loss_at_timesteps.append(loss)
+	# 	timesteps.append(it)
+	# 	loss_at_timesteps.append(loss)
 
-	print("Prediction at the end ", net_2layer.forward(x))
+	# print("Prediction at the end ", net_2layer.forward(x))
 
-	fig, ax = plt.subplots()
-	ax.plot(timesteps, loss_at_timesteps)
+	# fig, ax = plt.subplots()
+	# ax.plot(timesteps, loss_at_timesteps)
 
-	ax.set(xlabel='iteration (s)', ylabel='Training Loss',
-	       title='The Loss curve')
-	ax.grid()
+	# ax.set(xlabel='iteration (s)', ylabel='Training Loss',
+	#        title='The Loss curve')
+	# ax.grid()
 
-	#fig.savefig("test.png")
-	plt.show()
+	# #fig.savefig("test.png")
+	# plt.show()

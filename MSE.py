@@ -13,10 +13,10 @@ class MSE(Module):
 		# dim = 0 is necessary, otherwise returns just a scalar
 		self.pred = pred
 		self.y = y
-		return (pred - y).pow(2).sum(dim=0)/y.shape[0]
+		return (pred - y).pow(2).sum(dim=0).sum(dim=0)/y.shape[1]
 
 	def backward(self):
-		return 2*(self.pred - self.y)/self.y.shape[0]
+		return 2*(self.pred - self.y)/self.y.shape[1]
 
 if __name__ == '__main__':
 	x = Tensor([1, 2, 3])
