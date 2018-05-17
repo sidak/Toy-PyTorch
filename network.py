@@ -1,5 +1,4 @@
 from module import Module
-from variable import Variable
 from torch import Tensor
 
 class Network(Module):
@@ -41,5 +40,5 @@ class Network(Module):
 
 	def zero_grad(self):
 		for layer in layers:
-			for par in layer.param():
-				par.grad = _set_zero(par.grad)
+			for par_grad in layer.param_grad():
+				par_grad = _set_zero(par_grad)
