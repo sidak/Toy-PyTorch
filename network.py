@@ -3,13 +3,11 @@ from torch import Tensor
 
 class Network(Module):
 
-	def __init__(self, layers):
+	def __init__(self, layers, nb_samples):
 		super(Network, self).__init__()
 		self.layers = layers
-		#self.
-		#self.out_dim = out_dim
-		#self.weight = Variable(Tensor(out_dim, in_dim))
-		#self.bias = Variable(Tensor(out_dim, ))
+        self.nb_samples = nb_samples
+        self.init_weights()
 		
 	def forward(self , input):
 		inp = input
@@ -39,6 +37,10 @@ class Network(Module):
 		#print(zeros_list)
 		tens = Tensor(zeros_list).view(tens_shape)
 		return tens
+
+    def init_weights(self):
+        for layer in self.layers:
+            layer.init_weights(self.nb_samples)
 
 	def zero_grad(self):
 		for layer in self.layers:
