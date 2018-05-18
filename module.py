@@ -23,3 +23,6 @@ class Module(object):
 
 	def init_weights(self, nb_samples):
 		pass
+
+	def set_zero_grad(self):
+		pass

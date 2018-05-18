@@ -28,6 +28,8 @@ class Relu(Module):
 
 	def forward(self , input):
 		self.input = input
+		#print("The result of the forward in RELU is ")
+		#print(self._relu(input))
 		return self._relu(input)
 
 	def _relu(self, x):
@@ -38,11 +40,15 @@ class Relu(Module):
 		grad[grad>0] = 1.0
 		grad[grad<=0] = 0.0
 		return grad
-		
+
 	def backward(self , gradwrtinput):
 		#self.bias.grad = gradwrtinput
 		#self.weight.grad = gradwrtinput @ 
-		return gradwrtinput * self._relu_grad()
+		#print("The result of the backward in RELU is ")
+
+		result = gradwrtinput * self._relu_grad()
+		#print(result)
+		return result
 
 class Sigmoid(Module):
 

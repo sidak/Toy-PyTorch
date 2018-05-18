@@ -13,9 +13,13 @@ class MSE(Module):
 		# dim = 0 is necessary, otherwise returns just a scalar
 		self.pred = pred
 		self.y = y
+		#print("The result of forward in MSE is ")
+		#print((pred - y).pow(2).sum(dim=0).sum(dim=0)/y.shape[1])
 		return (pred - y).pow(2).sum(dim=0).sum(dim=0)/y.shape[1]
 
 	def backward(self):
+		#print("The result of backward in MSE is ")
+		#print(2*(self.pred - self.y)/self.y.shape[1])
 		return 2*(self.pred - self.y)/self.y.shape[1]
 
 if __name__ == '__main__':
