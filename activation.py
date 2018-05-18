@@ -15,8 +15,6 @@ class Tanh(Module):
 		return 1.0 - (2.0/ (1.0 + (2.0*x).exp()))
 
 	def backward(self, gradwrtinput):
-		#self.bias.grad = gradwrtinput
-		#self.weight.grad = gradwrtinput @ 
 		return gradwrtinput * (1.0 - (self._tanh(self.input) * self._tanh(self.input)))
 
 
@@ -28,8 +26,6 @@ class Relu(Module):
 
 	def forward(self , input):
 		self.input = input
-		#print("The result of the forward in RELU is ")
-		#print(self._relu(input))
 		return self._relu(input)
 
 	def _relu(self, x):
@@ -42,12 +38,7 @@ class Relu(Module):
 		return grad
 
 	def backward(self , gradwrtinput):
-		#self.bias.grad = gradwrtinput
-		#self.weight.grad = gradwrtinput @ 
-		#print("The result of the backward in RELU is ")
-
 		result = gradwrtinput * self._relu_grad()
-		#print(result)
 		return result
 
 class Sigmoid(Module):
