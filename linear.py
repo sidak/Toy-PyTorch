@@ -84,7 +84,7 @@ class Linear(Module):
 		# print("shape of gradwrtoutput", gradwrtoutput.shape)
 		# print("shape of bias grad", self.bias_grad.shape)
 
-		self.bias_grad += gradwrtoutput.sum(dim=1)
+		self.bias_grad += gradwrtoutput.sum(dim=1,keepdim=True)
 		nb_samples = gradwrtoutput.shape[1]
 		#print("gradwrtoutput is ", gradwrtoutput)
 		#print("input is ", self.input)
