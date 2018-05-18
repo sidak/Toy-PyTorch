@@ -80,11 +80,25 @@ class Linear(Module):
 	def backward(self , gradwrtoutput):
 		# init them to zero in the loop as params.zero_grad()
 		# Add then here I should accumulate
-		#print("shape of gradwrtoutput", gradwrtoutput.shape)
+		# print("------------------------------")
+		# print("shape of gradwrtoutput", gradwrtoutput.shape)
+		# print("shape of bias grad", self.bias_grad.shape)
+
 		self.bias_grad += gradwrtoutput.sum(dim=1)
 		nb_samples = gradwrtoutput.shape[1]
+		#print("gradwrtoutput is ", gradwrtoutput)
+		#print("input is ", self.input)
+		#print(gradwrtoutput.narrow(1, 0, 1))
+		#print(self.input.narrow(1, 0, 1).t())
+		#print()
 		#print("shape of input here", self.input.shape)
-		self.weight_grad +=  gradwrtoutput.view(-1, nb_samples) @ self.input.view(nb_samples, -1)
+		# print("shape of self.input", self.input.shape)
+		# print("shape of weight_grad ", self.weight_grad.shape)
+		# print("------------------------------")
+		
+		for i in range(nb_samples):
+			self.weight_grad += gradwrtoutput.narrow(1, i, 1) @ self.input.narrow(1, i, 1).t()
+		#self.weight_grad +=  gradwrtoutput.view(-1, nb_samples) @ self.input.view(nb_samples, -1)
 		#print("The result of the backward in LINEAR is ")
 		#print(self.weight.t() @ gradwrtoutput)
 		return self.weight.t() @ gradwrtoutput
@@ -98,6 +112,10 @@ class Linear(Module):
 	def set_param_grad(self, param_grad):
 		self.weight_grad = param_grad[0]
 		self.bias_grad = param_grad[1]
+
+	def set_zero_grad(self):
+		self.weight_grad.zero_()
+		self.bias_grad.zero_()
 
 	def update_param(self, lr):
 		self.weight = self.weight - lr*self.weight_grad
