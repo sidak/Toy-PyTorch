@@ -17,19 +17,30 @@ def generate_disc_set(nb):
     target = modified_input.pow(2).sum(dim=1).sub(1/ (2*math.pi)).sign().mul(-1).add(1).div(2).long()
     return input, target
 
+def conv_to_one_hot(labels):
+	one_hot = torch.Tensor(labels.shape[0], labels.max()+1).zero_()
+	one_hot.scatter_(1, labels.view(-1, 1), 1.0)
+	return one_hot
+
+def compute_nb_errors(pred, tgt):
+	return (pred!=tgt).long().sum()
+
 train_input, train_target = generate_disc_set(1000)
 test_input, test_target = generate_disc_set(1000)
 
+train_target_hot = conv_to_one_hot(train_target)
+
 num_hidden = 3
-weight_init ='uniform'
+weight_init ='uniform_non_neg'
+bias_init='zero'
 layers = []
-linear = Linear(2, 25, weight_init=weight_init)
+linear = Linear(2, 25, weight_init=weight_init, bias_init=bias_init)
 layers.append(linear)
 layers.append(Relu())
 for i in range(num_hidden-1):
-	layers.append(Linear(25, 25, weight_init=weight_init))
+	layers.append(Linear(25, 25, weight_init=weight_init, bias_init=bias_init))
 	layers.append(Relu())
-layers.append(Linear(25, 2, weight_init=weight_init))
+layers.append(Linear(25, 2, weight_init=weight_init, bias_init=bias_init))
 
 
 net_2layer = Network(layers, train_input.shape[0])
@@ -37,8 +48,8 @@ net_2layer = Network(layers, train_input.shape[0])
 mse = MSE()
 
 
-lr = 1e-3
-num_iter = 1400
+lr = 1e-2
+num_iter = 100
 
 timesteps = []
 loss_at_timesteps = []
@@ -46,33 +57,38 @@ loss_at_timesteps = []
 for it in range(num_iter):
 	
 	net_2layer.zero_grad()
+	'''
+	for layer in net_2layer.layers:
+		print([par.size() for par in layer.param()])
+	'''
 	pred_2layer = net_2layer.forward(train_input.view(-1, train_input.shape[0]))
-
-	loss = mse.forward(pred_2layer,test_input.view(-1, test_input.shape[0]))
-	print(loss)
-	#print("At iteration ", str(it), " the loss is ", loss)
+	
+	
+	#print("shape of pred layer", pred_2layer.shape)
+	loss = mse.forward(pred_2layer, train_target_hot.t())
+	print("At iteration ", str(it), " the loss is ", loss)
 	loss_grad = mse.backward()
 	net_2layer.backward(loss_grad)
 	net_2layer.grad_step(lr=1e-3)
-
 	timesteps.append(it)
 	loss_at_timesteps.append(loss)
 
-pred = net_2layer.forward(train_input.view(-1, train_input.shape[0]))
 
-_, pred = torch.max(pred, 0)
-print('Train accuracy:')
-print(torch.mean(torch.abs(pred - train_target).type(torch.FloatTensor)))
+final_pred_train = net_2layer.forward(train_input.view(-1, train_input.shape[0]))
+print('Number of training errors:')
+print(compute_nb_errors(final_pred_train.max(0)[1], train_target))
+
+final_pred_test = net_2layer.forward(test_input.view(-1, test_input.shape[0]))
+print('Number of test errors:')
+print(compute_nb_errors(final_pred_test.max(0)[1], test_target))
 
 
+fig, ax = plt.subplots()
+ax.plot(timesteps, loss_at_timesteps)
 
-# fig, ax = plt.subplots()
-# ax.plot(timesteps, loss_at_timesteps)
+ax.set(xlabel='iteration (s)', ylabel='Training Loss',
+	title='The Loss curve')
+ax.grid()
 
-# ax.set(xlabel='iteration (s)', ylabel='Training Loss',
-#        title='The Loss curve')
-# ax.grid()
-
-# #fig.savefig("test.png")
-# plt.show()
-
+fig.savefig("test.png")
+plt.show()
