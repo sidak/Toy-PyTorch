@@ -42,7 +42,6 @@ class Linear(Module):
 
 		"""
 
-
 		if self.weight_init is None:
 			self.weight = Tensor(self.out_dim, self.in_dim)
 		elif self.weight_init == 'ones':
@@ -102,7 +101,7 @@ class Linear(Module):
 		self.weight_grad.zero_()
 		self.bias_grad.zero_()
 
-	def update_param(self, lr):
+	def update_param(self, lr, wd=0):
 		""" Performs the gradient step once the forwards and backward passes have been done. """
-		self.weight = self.weight - lr*self.weight_grad
+		self.weight = self.weight * (1 - lr*wd) - lr*self.weight_grad
 		self.bias = self.bias - lr*self.bias_grad

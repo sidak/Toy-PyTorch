@@ -1,132 +1,99 @@
-from linear import Linear
 from torch import Tensor
+from random import shuffle
+import math
+
+from linear import Linear
 from network import Network
 from MSE import MSE
-import matplotlib
-import matplotlib.pyplot as plt
 from activation import Relu, Tanh
-def run_mini_example():
-
-	x = Tensor([1, 2, 3])
-	y = Tensor([7, 10])
-	print(x.shape, y.shape)
-
-	linear = Linear(x.shape[0], y.shape[0], weight_init='ones')
-	net = Network([linear])
-
-	pred = net.forward(x)
 
 
-	
-	#loss.backward()
-	print("Pred is ")
-	print(pred)
-	#print(x.grad)
+def generate_disc_set(nb):
+    input = Tensor(nb, 2).uniform_(0, 1)
+    modified_input = input - 0.5
+    #print(modified_input.pow(2).sum(1).sub(1/ (2*math.pi)).sign().mul(-1))
+    #print("Modified inputs are ", modified_input)
+    target = modified_input.pow(2).sum(dim=1).sub(1/ (2*math.pi)).sign().mul(-1).add(1).div(2).long()
+    return input, target
 
-def run_bigger_example():
-	x = Tensor([1, 2, 3])
-	y = Tensor([7, 10])
-	print(x.shape, y.shape)
+def generate_disc_set_origin(nb):
+    input = Tensor(nb, 2).uniform_(0, 1)
+    #print(modified_input.pow(2).sum(1).sub(1/ (2*math.pi)).sign().mul(-1))
+    #print("Modified inputs are ", modified_input)
+    target = input.pow(2).sum(dim=1).sub(1/ (2*math.pi)).sign().mul(-1).add(1).div(2).long()
+    return input, target
 
-	linear1 = Linear(x.shape[0], x.shape[0], weight_init='ones')
-	linear2 = Linear(x.shape[0], y.shape[0], weight_init='ones')
-	
-	net_2layer = Network([linear1, linear2])
-	pred_2layer = net_2layer.forward(x)
+def conv_to_one_hot(labels):
+    one_hot = Tensor(labels.shape[0], 2).zero_()
+    one_hot.scatter_(1, labels.view(-1, 1), 1.0)
+    return one_hot
 
-	#loss.backward()
-	print("pred_2layer is ")
-	print(pred_2layer)	
-	mse = MSE()
-	loss = mse.forward(pred_2layer, y)
-	print("loss for 2 layer net is ")
-	print(loss)
-	# Should be 2*(18-7) = 22
-	loss_grad = mse.backward()
-	print("loss_grad for 2layer net is ")
-	print(loss_grad)
-	print("Printing params Grad before ")
-	for layer in net_2layer.layers:
-		for par_grad in layer.param_grad():
-			print(par_grad)
+def compute_nb_errors(pred, tgt):
 
-	print("now setting param grad to zero")
-	net_2layer.zero_grad()
-	print("Printing params Grad after ")
-	for layer in net_2layer.layers:
-		for par_grad in layer.param_grad():
-			print(par_grad)
-	print("Printing params before backward")
-	for layer in net_2layer.layers:
-		for par in layer.param():
-			print(par)
-	print("Doing backward pass")
-	net_2layer.backward(loss_grad)
-	print("Printing params after backward")
-	for layer in net_2layer.layers:
-		for par in layer.param():
-			print(par)
-	print("Printing params Grad")
-	for layer in net_2layer.layers:
-		for par_grad in layer.param_grad():
-			print(par_grad)
-	print("Doing param update")
-	net_2layer.grad_step(lr=1e-3)
-	print("Printing params after update")
-	for layer in net_2layer.layers:
-		for par in layer.param():
-			print(par)
+    return (pred!=tgt).long().sum()
 
 
-if __name__ == '__main__':
-	
+# Generate Data
 
-	x = Tensor([[1, 2, 3], [1, 2, 3]])
-	y = Tensor([7, 10])
-	print(x.shape, y.shape)
+train_input, train_target = generate_disc_set(1000)
+test_input, test_target = generate_disc_set(1000)
 
-	#linear_a = Linear(x.shape[1], 4, weight_init='ones')
-	#linear_b = Linear(x.shape[0], y.shape[0], weight_init='ones')
-	#relu = Relu()
-	#net_2layer = Network([linear_a], 2)#, relu, linear_b])
-	#print(x.view(-1, 2).shape)
-	#print(net_2layer.forward(x.view(-1, 2)))
+train_target_hot = conv_to_one_hot(train_target)
 
-	linear1 = Linear(x.shape[0], x.shape[0], weight_init='ones')
-	linear2 = Linear(x.shape[0], y.shape[0], weight_init='ones')
-	
-	net_2layer = Network([linear1, linear2], 1)
+# Build network
+
+num_hidden = 3
+weight_init ='pytorch_default' 
+bias_init = 'zero' 
+layers = []
 
 
-	mse = MSE()
+linear = Linear(2, 25, weight_init=weight_init, bias_init=bias_init)
+layers.append(linear)
+layers.append(Relu())
+for i in range(num_hidden-1):
+    layers.append(Linear(25, 25, weight_init=weight_init, bias_init=bias_init))
+    layers.append(Relu())
+layers.append(Linear(25, 2, weight_init=weight_init, bias_init=bias_init))
+layers.append(Tanh())
+net_2layer = Network(layers, train_input.shape[0])
 
-	lr = 1e-3
-	num_iter = 200
+# Choose loss
 
-	timesteps = []
-	loss_at_timesteps = []
+mse = MSE()
 
-	for it in range(num_iter):
-		
-		net_2layer.zero_grad()
-		pred_2layer = net_2layer.forward(x)
-		loss = mse.forward(pred_2layer, y)
-		print("At iteration ", str(it), " the loss is ", loss)
-		loss_grad = mse.backward()
-		net_2layer.backward(loss_grad)
-		net_2layer.grad_step(lr=1e-3)
+# Choose parameters
 
-		timesteps.append(it)
-		loss_at_timesteps.append(loss)
+lr = 0.05
+num_iter = 1000
 
-	print("Prediction at the end ", net_2layer.forward(x))
+timesteps = []
+loss_at_timesteps = []
 
-	fig, ax = plt.subplots()
-	ax.plot(timesteps, loss_at_timesteps)
+# Train model
 
-	ax.set(xlabel='iteration (s)', ylabel='Training Loss',
-	       title='The Loss curve')
-	ax.grid()
+for it in range(num_iter):
 
-	#fig.savefig("test.png")
-	plt.show()
+    net_2layer.zero_grad()
+
+    pred_2layer = net_2layer.forward(train_input.t())
+    
+    loss = mse.forward(pred_2layer, train_target_hot.t())
+
+    print("At iteration ", str(it), " the loss is ", loss)
+    loss_grad = mse.backward()
+    net_2layer.backward(loss_grad)
+
+    net_2layer.grad_step(lr=lr)
+
+    timesteps.append(it)
+    loss_at_timesteps.append(loss)
+
+
+final_pred_train = net_2layer.forward(train_input.t())
+print('Number of training errors:')
+print(compute_nb_errors(final_pred_train.max(0)[1], train_target))
+
+final_pred_test = net_2layer.forward(test_input.t())
+print('Number of test errors:')
+print(compute_nb_errors(final_pred_test.max(0)[1], test_target))

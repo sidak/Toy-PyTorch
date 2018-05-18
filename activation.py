@@ -17,7 +17,6 @@ class Tanh(Module):
 	def backward(self, gradwrtinput):
 		return gradwrtinput * (1.0 - (self._tanh(self.input) * self._tanh(self.input)))
 
-
 class Relu(Module):
 
 	def __init__(self):
@@ -39,6 +38,32 @@ class Relu(Module):
 
 	def backward(self , gradwrtinput):
 		result = gradwrtinput * self._relu_grad()
+		return result
+
+class LeakyRelu(Module):
+
+	def __init__(self, alpha=0.01):
+		super(LeakyRelu, self).__init__()
+		self.input = None
+		self.alpha = alpha
+
+	def forward(self , input):
+		self.input = input
+		return self._lrelu(input)
+
+	def _lrelu(self, x):
+		x_ = x
+		x_[x_ < 0] = x_[x_ < 0] * self.alpha
+		return x_
+
+	def _lrelu_grad(self):
+		grad = self.input
+		grad[grad>0] = 1.0
+		grad[grad<=0] = self.alpha
+		return grad
+
+	def backward(self , gradwrtinput):
+		result = gradwrtinput * self._lrelu_grad()
 		return result
 
 class Sigmoid(Module):

@@ -4,6 +4,10 @@ from torch import Tensor
 class Network(Module):
 
 	def __init__(self, layers, nb_samples):
+		""" 
+			layers is the list of layers of the network, and nb_samples the number of 
+			samples to be passed via the forward.
+		"""
 		super(Network, self).__init__()
 		self.layers = layers
 		self.nb_samples = nb_samples
@@ -39,11 +43,10 @@ class Network(Module):
 
 	def zero_grad(self):
 		for layer in self.layers:
-			#layer.set_param_grad([self._set_zero(par_grad) for par_grad in layer.param_grad()])
 			layer.set_zero_grad()
 			
-	def grad_step(self, lr):
+	def grad_step(self, lr, wd=0):
 		for layer in self.layers:
-			layer.update_param(lr)
+			layer.update_param(lr, wd)
 
 	

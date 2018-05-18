@@ -1,3 +1,7 @@
+'''
+	Interface for the layers (activations, linear)
+
+'''
 class Module(object):
 
 	def __init__(self):
@@ -18,7 +22,7 @@ class Module(object):
 	def set_param_grad(self, param_grad):
 		pass
 
-	def update_param(self, lr):
+	def update_param(self, lr, wd):
 		pass
 
 	def init_weights(self, nb_samples):
