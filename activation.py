@@ -33,10 +33,16 @@ class Relu(Module):
 	def _relu(self, x):
 		return (x.abs() + x)/2.0
 
+	def _relu_grad(self):
+		grad = self.input
+		grad[grad>0] = 1.0
+		grad[grad<=0] = 0.0
+		return grad
+		
 	def backward(self , gradwrtinput):
 		#self.bias.grad = gradwrtinput
 		#self.weight.grad = gradwrtinput @ 
-		return gradwrtinput * self._relu(self.input)
+		return gradwrtinput * self._relu_grad()
 
 class Sigmoid(Module):
 
