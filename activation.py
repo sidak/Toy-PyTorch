@@ -14,8 +14,8 @@ class Tanh(Module):
 	def _tanh(self, x):
 		return 1.0 - (2.0/ (1.0 + (2.0*x).exp()))
 
-	def backward(self, gradwrtinput):
-		return gradwrtinput * (1.0 - (self._tanh(self.input) * self._tanh(self.input)))
+	def backward(self, gradwrtoutput):
+		return gradwrtoutput * (1.0 - (self._tanh(self.input) * self._tanh(self.input)))
 
 class Relu(Module):
 
@@ -36,8 +36,8 @@ class Relu(Module):
 		grad[grad<=0] = 0.0
 		return grad
 
-	def backward(self , gradwrtinput):
-		result = gradwrtinput * self._relu_grad()
+	def backward(self , gradwrtoutput):
+		result = gradwrtoutput * self._relu_grad()
 		return result
 
 class LeakyRelu(Module):
@@ -62,8 +62,8 @@ class LeakyRelu(Module):
 		grad[grad<=0] = self.alpha
 		return grad
 
-	def backward(self , gradwrtinput):
-		result = gradwrtinput * self._lrelu_grad()
+	def backward(self , gradwrtoutput):
+		result = gradwrtoutput * self._lrelu_grad()
 		return result
 
 class Sigmoid(Module):
@@ -79,5 +79,5 @@ class Sigmoid(Module):
 	def _sigmoid(self,x):
 		return x.exp()/(x.exp()+1.0)
 
-	def backward(self, gradwrtinput):
-		return gradwrtinput * self._sigmoid(self.input) * (1.0 - self._sigmoid(self.input))
+	def backward(self, gradwrtoutput):
+		return gradwrtoutput * self._sigmoid(self.input) * (1.0 - self._sigmoid(self.input))
