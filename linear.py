@@ -1,9 +1,9 @@
 from module import Module
 from torch import Tensor
-
+import math
 class Linear(Module):
 
-	def __init__(self, in_dim, out_dim, weight_init=None, bias_init='zero'):
+	def __init__(self, in_dim, out_dim, weight_init='uniform_pos_neg', bias_init='zero'):
 		super(Linear, self).__init__()
 		self.in_dim = in_dim
 		self.out_dim = out_dim
@@ -11,7 +11,8 @@ class Linear(Module):
 		self.bias_init = bias_init
 		self.weight_grad = None
 		self.bias_grad = None
-
+		self.weight = None
+		self.bias = None
 
 	def init_weights(self, nb_samples):
 
@@ -24,6 +25,9 @@ class Linear(Module):
 			self.weight = Tensor(self.out_dim, self.in_dim).uniform_(-1, 1)
 		elif self.weight_init == 'uniform_non_neg':
 			self.weight = Tensor(self.out_dim, self.in_dim).uniform_(0, 1)
+		elif self.weight_init == 'pytorch_default':
+			stdv = 1. / math.sqrt(self.in_dim)
+			self.weight = Tensor(self.out_dim, self.in_dim).uniform_(-stdv, stdv)
 
 		self.weight_grad = Tensor(self.out_dim, self.in_dim)
 		'''
@@ -48,6 +52,10 @@ class Linear(Module):
 			self.bias = Tensor(self.out_dim, 1).uniform_(-1, 1)
 		elif self.bias_init == 'uniform_non_neg':
 			self.bias = Tensor(self.out_dim, 1).uniform_(0, 1)
+		elif self.bias_init == 'pytorch_default':
+			stdv = 1. / math.sqrt(self.in_dim)
+			self.bias = Tensor(self.out_dim, 1).uniform_(-stdv, stdv)
+
 
 		self.bias_grad = Tensor(self.out_dim, 1)
 		
@@ -65,7 +73,8 @@ class Linear(Module):
 		#print("shape of bias expanded is ", self.bias.repeat(1, input.shape[1]).shape)
 
 		#print("shape of wt @ input  is ", (self.weight @ input).shape)
-		
+		#print("The result of the forward in LINEAR is ")
+		#print(self.weight @ input + self.bias.repeat(1, input.shape[1]))
 		return self.weight @ input + self.bias.repeat(1, input.shape[1])
 	
 	def backward(self , gradwrtoutput):
@@ -76,6 +85,8 @@ class Linear(Module):
 		nb_samples = gradwrtoutput.shape[1]
 		#print("shape of input here", self.input.shape)
 		self.weight_grad +=  gradwrtoutput.view(-1, nb_samples) @ self.input.view(nb_samples, -1)
+		#print("The result of the backward in LINEAR is ")
+		#print(self.weight.t() @ gradwrtoutput)
 		return self.weight.t() @ gradwrtoutput
 	
 	def param(self):
