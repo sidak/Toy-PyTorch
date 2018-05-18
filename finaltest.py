@@ -31,15 +31,15 @@ test_input, test_target = generate_disc_set(1000)
 train_target_hot = conv_to_one_hot(train_target)
 
 num_hidden = 3
-weight_init ='uniform_non_neg'
-bias_init='zero'
+weight_init ='uniform_pos_neg'
+bias_init='uniform_pos_neg'
 layers = []
 linear = Linear(2, 25, weight_init=weight_init, bias_init=bias_init)
 layers.append(linear)
-layers.append(Relu())
+layers.append(Tanh())
 for i in range(num_hidden-1):
 	layers.append(Linear(25, 25, weight_init=weight_init, bias_init=bias_init))
-	layers.append(Relu())
+	layers.append(Tanh())
 layers.append(Linear(25, 2, weight_init=weight_init, bias_init=bias_init))
 
 
@@ -48,8 +48,8 @@ net_2layer = Network(layers, train_input.shape[0])
 mse = MSE()
 
 
-lr = 1e-2
-num_iter = 100
+lr = 1e-3
+num_iter = 1000
 
 timesteps = []
 loss_at_timesteps = []
@@ -69,7 +69,7 @@ for it in range(num_iter):
 	print("At iteration ", str(it), " the loss is ", loss)
 	loss_grad = mse.backward()
 	net_2layer.backward(loss_grad)
-	net_2layer.grad_step(lr=1e-3)
+	net_2layer.grad_step(lr=lr)
 	timesteps.append(it)
 	loss_at_timesteps.append(loss)
 
