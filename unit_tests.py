@@ -5,6 +5,23 @@ from MSE import MSE
 import matplotlib
 import matplotlib.pyplot as plt
 from activation import Relu, Tanh
+
+
+### Unit Tests
+
+def test_linear_weights():
+
+	w = Tensor([[2, 4, 8], [16, 32, 69]])
+	b = Tensor([0, 0, 0])
+	x = Tensor([3, 9, 27])
+	print(w.shape, b.shape)
+
+	l1 = Linear(2, 3)
+	l1.init_weights(1)
+	w, b = l1.param()
+
+	print(w.shape, b.shape)
+
 def run_mini_example():
 
 	x = Tensor([1, 2, 3])
