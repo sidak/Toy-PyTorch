@@ -20,3 +20,6 @@ class Module(object):
 
 	def update_param(self, lr):
 		pass
+
+	def init_weights(self, nb_samples):
+		pass
