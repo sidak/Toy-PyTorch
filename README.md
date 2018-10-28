@@ -21,4 +21,6 @@ While PyTorch used to follow the Variable, we don't keep an extra class for it, 
 
 Since the library is meant to be used solely for the purpose of simple MLP, we opted for simplicity and added the optimizer directly to the network.
 
+## Acknowledgements
+
 This work was done jointly with [Ignacio Aleman](https://github.com/Nacho114) and [Nawel Naas](https://github.com/naweln). 
